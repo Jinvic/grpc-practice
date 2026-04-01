@@ -1,13 +1,15 @@
 version: v2
-managed:
-  enabled: true
-  override:
-    - file_option: go_package
-      path: book/v1
-      value: bookstore/api/book/v1;bookv1
-    - file_option: go_package
-      path: common/v1
-      value: bookstore/api/common/v1;commonv1
+# managed usage example
+# managed:
+#   enabled: true
+#   override:
+#     - file_option: go_package
+#       path: book/v1
+#       value: bookstore/api/book/v1;bookv1
+#     - file_option: go_package
+#       path: common/v1
+#       value: bookstore/api/common/v1;commonv1
+
 plugins:
   - remote: buf.build/protocolbuffers/go
     out: api
@@ -17,5 +19,17 @@ plugins:
     out: api
     opt:
       - paths=source_relative
-inputs:
-  - directory: api
+
+  # local plugin usage example
+  # - local: protoc-gen-go
+  #   out: api/bookstore/v1
+  #   opt:
+  #     - paths=source_relative
+  # - local: protoc-gen-go-grpc
+  #   out: api/bookstore/v1
+  #   opt:
+  #     - paths=source_relative
+
+# inputs usage example
+# inputs:
+#   - directory: api
