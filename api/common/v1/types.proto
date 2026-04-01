@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package common.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "bookstore/api/common/v1;commonv1";
+
+enum BookStatus {
+  BOOK_STATUS_UNSPECIFIED = 0;
+  BOOK_STATUS_AVAILABLE = 1; // 可用
+  BOOK_STATUS_UNAVAILABLE = 2; // 不可用
+  BOOK_STATUS_BORROWED = 3; // 借出
+  BOOK_STATUS_LOST = 4; // 丢失
+  BOOK_STATUS_RESERVED = 6; // 预约
+}
+
+message Book {
+  int64 id = 1;
+  BookStatus status = 2;
+  google.protobuf.Timestamp created_at = 3;
+  google.protobuf.Timestamp updated_at = 4;
+  google.protobuf.Timestamp deleted_at = 5;
+  string title = 6;
+  string author = 7;
+  double price = 8;
+  string isbn = 9;
+  string publisher = 10;
+  google.protobuf.Timestamp published_at = 11;
+}
+
+message OrderBy {
+  string field = 1;
+  bool ascending = 2;
+}

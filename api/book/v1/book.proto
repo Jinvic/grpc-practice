@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package book.v1;
+
+import "common/v1/types.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "bookstore/api/book/v1;bookv1";
+
+service BookService {
+  rpc GetBook(GetBookRequest) returns (GetBookResponse);
+  rpc CreateBook(CreateBookRequest) returns (CreateBookResponse);
+  rpc ListBooks(ListBooksRequest) returns (ListBooksResponse);
+  rpc UpdateBook(UpdateBookRequest) returns (UpdateBookResponse);
+  rpc DeleteBook(DeleteBookRequest) returns (DeleteBookResponse);
+}
+
+message GetBookRequest {
+  int64 id = 1;
+}
+
+message GetBookResponse {
+  common.v1.Book book = 1;
+}
+
+message CreateBookRequest {
+  common.v1.Book book = 1;
+}
+
+message CreateBookResponse {
+  common.v1.Book book = 1;
+}
+
+message ListBooksRequest {
+  int32 page_number = 1;
+  int32 page_size = 2;
+  repeated common.v1.OrderBy order_by = 3;
+  map<string, google.protobuf.Value> filter = 4;
+}
+
+message ListBooksResponse {
+  repeated common.v1.Book books = 1;
+  int32 total_count = 2;
+  int32 page_number = 3;
+  int32 page_size = 4;
+}
+
+message UpdateBookRequest {
+  common.v1.Book book = 1;
+  google.protobuf.FieldMask update_mask = 2;
+}
+
+message UpdateBookResponse {
+  common.v1.Book book = 1;
+}
+
+message DeleteBookRequest {
+  int64 id = 1;
+}
+
+message DeleteBookResponse {
+  int64 id = 1;
+  google.protobuf.Timestamp deleted_at = 2;
+}
