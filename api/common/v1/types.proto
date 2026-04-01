@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package common.v1;
 
+import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "bookstore/api/common/v1;commonv1";
@@ -23,7 +24,7 @@ message Book {
   google.protobuf.Timestamp deleted_at = 5;
   string title = 6;
   string author = 7;
-  double price = 8;
+  double price = 8 [(buf.validate.field).double.gte = 0];
   string isbn = 9;
   string publisher = 10;
   google.protobuf.Timestamp published_at = 11;

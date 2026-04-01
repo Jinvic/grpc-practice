@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package book.v1;
 
+import "buf/validate/validate.proto";
 import "common/v1/types.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/struct.proto";
@@ -18,7 +19,7 @@ service BookService {
 }
 
 message GetBookRequest {
-  int64 id = 1;
+  int64 id = 1 [(buf.validate.field).int64.gte = 1];
 }
 
 message GetBookResponse {
@@ -26,7 +27,13 @@ message GetBookResponse {
 }
 
 message CreateBookRequest {
-  common.v1.Book book = 1;
+  common.v1.Book book = 1 [(buf.validate.field).cel = {
+    id: "create_book.required_fields"
+    message: "title and author are required"
+    expression:
+      "this.title != ''"
+      "&& this.author != ''"
+  }];
 }
 
 message CreateBookResponse {
@@ -34,8 +41,8 @@ message CreateBookResponse {
 }
 
 message ListBooksRequest {
-  int32 page_number = 1;
-  int32 page_size = 2;
+  optional int32 page_number = 1 [(buf.validate.field).int32.gte = 1];
+  optional int32 page_size = 2 [(buf.validate.field).int32.gte = 1];
   repeated common.v1.OrderBy order_by = 3;
   map<string, google.protobuf.Value> filter = 4;
 }
@@ -48,7 +55,11 @@ message ListBooksResponse {
 }
 
 message UpdateBookRequest {
-  common.v1.Book book = 1;
+  common.v1.Book book = 1 [(buf.validate.field).cel = {
+    id: "update_book.required_fields"
+    message: "id is required"
+    expression: "this.id > 0"
+  }];
   google.protobuf.FieldMask update_mask = 2;
 }
 
@@ -57,7 +68,7 @@ message UpdateBookResponse {
 }
 
 message DeleteBookRequest {
-  int64 id = 1;
+  int64 id = 1 [(buf.validate.field).int64.gte = 1];
 }
 
 message DeleteBookResponse {
