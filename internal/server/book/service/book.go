@@ -2,8 +2,6 @@ package service
 
 import (
 	bookv1 "bookstore/api/book/v1"
-	commonv1 "bookstore/api/common/v1"
-	"bookstore/internal/server/book/model/biz"
 	"bookstore/internal/server/book/usecase"
 	"context"
 
@@ -26,17 +24,17 @@ func (s *BookService) GetBook(ctx context.Context, req *bookv1.GetBookRequest) (
 		return nil, status.Errorf(codes.Internal, "failed to get book: %v", err)
 	}
 
-	return &bookv1.GetBookResponse{Book: bizBook.ToV1Book()}, nil
+	return &bookv1.GetBookResponse{Book: BizToV1Book(bizBook)}, nil
 }
 
 func (s *BookService) CreateBook(ctx context.Context, req *bookv1.CreateBookRequest) (*bookv1.CreateBookResponse, error) {
-	bizBook := biz.FromV1Book(req.Book)
+	bizBook := V1ToBizBook(req.Book)
 	bizBook, err := s.bu.CreateBook(ctx, bizBook)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to create book: %v", err)
 	}
 
-	return &bookv1.CreateBookResponse{Book: bizBook.ToV1Book()}, nil
+	return &bookv1.CreateBookResponse{Book: BizToV1Book(bizBook)}, nil
 }
 
 func (s *BookService) ListBooks(ctx context.Context, req *bookv1.ListBooksRequest) (*bookv1.ListBooksResponse, error) {
@@ -58,10 +56,7 @@ func (s *BookService) ListBooks(ctx context.Context, req *bookv1.ListBooksReques
 		return nil, status.Errorf(codes.Internal, "failed to list books: %v", err)
 	}
 
-	books := make([]*commonv1.Book, len(bizBooks))
-	for i, bizBook := range bizBooks {
-		books[i] = bizBook.ToV1Book()
-	}
+	books := BizListToV1BookList(bizBooks)
 
 	return &bookv1.ListBooksResponse{
 		Books:      books,
@@ -72,13 +67,13 @@ func (s *BookService) ListBooks(ctx context.Context, req *bookv1.ListBooksReques
 }
 
 func (s *BookService) UpdateBook(ctx context.Context, req *bookv1.UpdateBookRequest) (*bookv1.UpdateBookResponse, error) {
-	bizBook := biz.FromV1Book(req.Book)
+	bizBook := V1ToBizBook(req.Book)
 	bizBook, err := s.bu.UpdateBook(ctx, bizBook)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to update book: %v", err)
 	}
 
-	return &bookv1.UpdateBookResponse{Book: bizBook.ToV1Book()}, nil
+	return &bookv1.UpdateBookResponse{Book: BizToV1Book(bizBook)}, nil
 }
 
 func (s *BookService) DeleteBook(ctx context.Context, req *bookv1.DeleteBookRequest) (*bookv1.DeleteBookResponse, error) {
