@@ -8,6 +8,7 @@ import (
 	"net"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 type BookServer struct {
@@ -27,6 +28,7 @@ func (s *BookServer) Run(ctx context.Context) error {
 	defer lis.Close()
 
 	grpcServer := grpc.NewServer()
+	reflection.Register(grpcServer)
 	bookv1.RegisterBookServiceServer(grpcServer, BuildBookService())
 
 	go func() {
