@@ -5,6 +5,7 @@ import (
 	"bookstore/internal/server/book/usecase"
 	"context"
 
+	"github.com/samber/do/v2"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -14,8 +15,9 @@ type BookService struct {
 	bu *usecase.BookUsecase
 }
 
-func NewBookService(bu *usecase.BookUsecase) *BookService {
-	return &BookService{bu: bu}
+func NewBookService(i do.Injector) (*BookService, error) {
+	bu := do.MustInvoke[*usecase.BookUsecase](i)
+	return &BookService{bu: bu}, nil
 }
 
 func (s *BookService) GetBook(ctx context.Context, req *bookv1.GetBookRequest) (*bookv1.GetBookResponse, error) {

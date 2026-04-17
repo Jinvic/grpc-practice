@@ -3,12 +3,14 @@ package repo
 import (
 	"bookstore/internal/server/book/model/biz"
 	"context"
+
+	"github.com/samber/do/v2"
 )
 
 type BookRepository struct{}
 
-func NewBookRepository() *BookRepository {
-	return &BookRepository{}
+func NewBookRepository(i do.Injector) (*BookRepository, error) {
+	return &BookRepository{}, nil
 }
 
 func (r *BookRepository) GetBook(ctx context.Context, id int64) (*biz.Book, error) {

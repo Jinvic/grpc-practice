@@ -17,6 +17,8 @@ require (
 	github.com/google/cel-go v0.27.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
+	github.com/samber/do/v2 v2.0.0 // indirect
+	github.com/samber/go-type-to-string v1.8.0 // indirect
 	golang.org/x/exp v0.0.0-20250813145105-42675adae3e6 // indirect
 	golang.org/x/net v0.47.0 // indirect
 	golang.org/x/sys v0.38.0 // indirect

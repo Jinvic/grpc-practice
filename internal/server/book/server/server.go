@@ -2,12 +2,14 @@ package server
 
 import (
 	bookv1 "bookstore/api/book/v1"
+	"bookstore/internal/server/book/service"
 	"bookstore/internal/server/common/interceptor"
 	"context"
 	"fmt"
 	"log"
 	"net"
 
+	"github.com/samber/do/v2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -41,7 +43,12 @@ func (s *BookServer) Run(ctx context.Context) error {
 		),
 	)
 	reflection.Register(grpcServer)
-	bookv1.RegisterBookServiceServer(grpcServer, BuildBookService())
+
+	if err := InitInjector(); err != nil {
+		return fmt.Errorf("failed to initialize injector: %w", err)
+	}
+	bookService := do.MustInvoke[*service.BookService](injector)
+	bookv1.RegisterBookServiceServer(grpcServer, bookService)
 
 	go func() {
 		<-ctx.Done()
