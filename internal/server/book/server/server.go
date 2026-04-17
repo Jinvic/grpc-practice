@@ -8,7 +8,6 @@ import (
 	"log"
 	"net"
 
-	"buf.build/go/protovalidate"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -29,13 +28,14 @@ func (s *BookServer) Run(ctx context.Context) error {
 	}
 	defer lis.Close()
 
-	validator, err := protovalidate.New()
-	if err != nil {
-		return fmt.Errorf("failed to create validator: %w", err)
+	if err := interceptor.Initialize(); err != nil {
+		return fmt.Errorf("failed to initialize interceptor: %w", err)
 	}
 
 	grpcServer := grpc.NewServer(
-		grpc.ChainUnaryInterceptor(interceptor.ValidateInterceptor(validator)),
+		grpc.ChainUnaryInterceptor(
+			interceptor.ValidateInterceptor(),
+		),
 	)
 	reflection.Register(grpcServer)
 	bookv1.RegisterBookServiceServer(grpcServer, BuildBookService())
