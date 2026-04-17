@@ -2,6 +2,7 @@ package server
 
 import (
 	bookv1 "bookstore/api/book/v1"
+	"bookstore/config"
 	"bookstore/internal/server/book/service"
 	"bookstore/internal/server/common/interceptor"
 	"context"
@@ -15,16 +16,20 @@ import (
 )
 
 type BookServer struct {
-	port int
 }
 
-func NewBookServer(port int) *BookServer {
-	return &BookServer{port: port}
+func NewBookServer() *BookServer {
+	return &BookServer{}
 }
 
 func (s *BookServer) Run(ctx context.Context) error {
+	injector := do.New()
+	if err := InitInjector(injector); err != nil {
+		return fmt.Errorf("failed to initialize injector: %w", err)
+	}
 
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", s.port))
+	port := do.MustInvoke[*config.Config](injector).Services.Book.Port
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
 		return fmt.Errorf("failed to listen: %w", err)
 	}
@@ -44,9 +49,6 @@ func (s *BookServer) Run(ctx context.Context) error {
 	)
 	reflection.Register(grpcServer)
 
-	if err := InitInjector(); err != nil {
-		return fmt.Errorf("failed to initialize injector: %w", err)
-	}
 	bookService := do.MustInvoke[*service.BookService](injector)
 	bookv1.RegisterBookServiceServer(grpcServer, bookService)
 
@@ -56,7 +58,7 @@ func (s *BookServer) Run(ctx context.Context) error {
 		grpcServer.GracefulStop()
 	}()
 
-	log.Printf("server listening at port %d", s.port)
+	log.Printf("server listening at port %d", port)
 	if err := grpcServer.Serve(lis); err != nil {
 		if err == grpc.ErrServerStopped {
 			log.Println("server stopped")

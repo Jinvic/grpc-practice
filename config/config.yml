@@ -1,0 +1,5 @@
+environment: dev
+services:
+  book:
+    host: localhost
+    port: 8081

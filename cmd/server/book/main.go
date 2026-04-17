@@ -10,13 +10,9 @@ import (
 	"syscall"
 )
 
-var (
-	port = flag.Int("port", 8081, "The server port")
-)
-
 func main() {
 	flag.Parse()
-	server := server.NewBookServer(*port)
+	server := server.NewBookServer()
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 

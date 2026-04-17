@@ -1,6 +1,7 @@
 package server
 
 import (
+	"bookstore/config"
 	"bookstore/internal/server/book/repo"
 	"bookstore/internal/server/book/service"
 	"bookstore/internal/server/book/usecase"
@@ -8,12 +9,10 @@ import (
 	"github.com/samber/do/v2"
 )
 
-var injector do.Injector
-
-func InitInjector() error {
-	injector = do.New()
-	do.Provide(injector, repo.NewBookRepository)
-	do.Provide(injector, usecase.NewBookUsecase)
-	do.Provide(injector, service.NewBookService)
+func InitInjector(i do.Injector) error {
+	do.Provide(i, config.GetConfig)
+	do.Provide(i, repo.NewBookRepository)
+	do.Provide(i, usecase.NewBookUsecase)
+	do.Provide(i, service.NewBookService)
 	return nil
 }
