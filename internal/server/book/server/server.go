@@ -2,11 +2,13 @@ package server
 
 import (
 	bookv1 "bookstore/api/book/v1"
+	"bookstore/internal/common/interceptor"
 	"context"
 	"fmt"
 	"log"
 	"net"
 
+	"buf.build/go/protovalidate"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -27,7 +29,14 @@ func (s *BookServer) Run(ctx context.Context) error {
 	}
 	defer lis.Close()
 
-	grpcServer := grpc.NewServer()
+	validator, err := protovalidate.New()
+	if err != nil {
+		return fmt.Errorf("failed to create validator: %w", err)
+	}
+
+	grpcServer := grpc.NewServer(
+		grpc.ChainUnaryInterceptor(interceptor.ValidateInterceptor(validator)),
+	)
 	reflection.Register(grpcServer)
 	bookv1.RegisterBookServiceServer(grpcServer, BuildBookService())
 
