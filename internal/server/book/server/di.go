@@ -1,7 +1,7 @@
 package server
 
 import (
-	"bookstore/config"
+	"bookstore/internal/pkg/config"
 	"bookstore/internal/server/book/repo"
 	"bookstore/internal/server/book/service"
 	"bookstore/internal/server/book/usecase"

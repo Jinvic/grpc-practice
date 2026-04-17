@@ -2,7 +2,7 @@ package server
 
 import (
 	bookv1 "bookstore/api/book/v1"
-	"bookstore/config"
+	"bookstore/internal/pkg/config"
 	"bookstore/internal/server/book/service"
 	"bookstore/internal/server/common/interceptor"
 	"context"
