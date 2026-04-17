@@ -19,6 +19,10 @@ func InitValidateInterceptor() error {
 	return nil
 }
 
-func ValidateInterceptor(opts ...protovalidate_middleware.Option) grpc.UnaryServerInterceptor {
+func ValidateUnaryInterceptor(opts ...protovalidate_middleware.Option) grpc.UnaryServerInterceptor {
 	return protovalidate_middleware.UnaryServerInterceptor(validator, opts...)
+}
+
+func ValidateStreamInterceptor(opts ...protovalidate_middleware.Option) grpc.StreamServerInterceptor {
+	return protovalidate_middleware.StreamServerInterceptor(validator, opts...)
 }

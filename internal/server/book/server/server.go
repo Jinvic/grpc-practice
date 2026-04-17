@@ -34,7 +34,10 @@ func (s *BookServer) Run(ctx context.Context) error {
 
 	grpcServer := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
-			interceptor.ValidateInterceptor(),
+			interceptor.ValidateUnaryInterceptor(),
+		),
+		grpc.ChainStreamInterceptor(
+			interceptor.ValidateStreamInterceptor(),
 		),
 	)
 	reflection.Register(grpcServer)
