@@ -6,7 +6,10 @@ import (
 	"bookstore/internal/pkg/config"
 	"context"
 	"fmt"
+	"time"
 
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/retry"
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/timeout"
 	"github.com/samber/do/v2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -24,6 +27,13 @@ func NewClient(i do.Injector) (*Client, error) {
 
 	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithChainUnaryInterceptor(
+			timeout.UnaryClientInterceptor(5*time.Second),
+			retry.UnaryClientInterceptor(
+				retry.WithMax(3),
+				retry.WithPerRetryTimeout(2*time.Second),
+			),
+		),
 	}
 	conn, err := grpc.NewClient(serverAddr, opts...)
 	if err != nil {
