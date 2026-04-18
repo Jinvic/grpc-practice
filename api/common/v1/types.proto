@@ -34,3 +34,9 @@ message OrderBy {
   string field = 1;
   bool ascending = 2;
 }
+
+enum HeartBeatType {
+  HEART_BEAT_TYPE_UNSPECIFIED = 0;
+  HEART_BEAT_TYPE_PING = 1; // 心跳请求
+  HEART_BEAT_TYPE_PONG = 2; // 心跳响应
+}

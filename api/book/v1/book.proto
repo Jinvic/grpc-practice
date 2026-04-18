@@ -16,6 +16,9 @@ service BookService {
   rpc ListBooks(ListBooksRequest) returns (ListBooksResponse);
   rpc UpdateBook(UpdateBookRequest) returns (UpdateBookResponse);
   rpc DeleteBook(DeleteBookRequest) returns (DeleteBookResponse);
+  rpc BatchImportBooks(stream BatchImportBooksRequest) returns (BatchImportBooksResponse);
+  rpc BatchExportBooks(BatchExportBooksRequest) returns (stream BatchExportBooksResponse);
+  rpc HeartBeat(stream HeartBeatRequest) returns (stream HeartBeatResponse);
 }
 
 message GetBookRequest {
@@ -74,4 +77,37 @@ message DeleteBookRequest {
 message DeleteBookResponse {
   int64 id = 1;
   google.protobuf.Timestamp deleted_at = 2;
+}
+
+message BatchImportBooksRequest {
+  common.v1.Book book = 1;
+}
+
+message BatchImportBooksResponse {
+  int32 total = 1;
+  int32 success = 2;
+  repeated string error_messages = 3;
+}
+
+message BatchExportBooksRequest {
+  repeated int64 book_ids = 1;
+}
+
+message BatchExportBooksResponse {
+  int64 book_id = 1;
+  common.v1.Book book = 2;
+  string error_message = 3;
+}
+
+message HeartBeatRequest {
+  // 1: ping, 2: pong
+  common.v1.HeartBeatType type = 1 [(buf.validate.field).enum.defined_only = true];
+  int64 sent_at = 2;
+}
+
+message HeartBeatResponse {
+  // 1: ping, 2: pong
+  common.v1.HeartBeatType type = 1;
+  int64 sent_at = 2;
+  int64 received_at = 3;
 }
