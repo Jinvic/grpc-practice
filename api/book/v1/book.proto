@@ -107,7 +107,6 @@ message HeartBeatRequest {
 
 message HeartBeatResponse {
   // 1: ping, 2: pong
-  common.v1.HeartBeatType type = 1;
+  common.v1.HeartBeatType type = 1 [(buf.validate.field).enum.defined_only = true];
   int64 sent_at = 2;
-  int64 received_at = 3;
 }

@@ -203,15 +203,14 @@ func (s *BookService) HeartBeat(stream bookv1.BookService_HeartBeatServer) error
 				return status.Errorf(codes.Internal, "failed to receive request: %v", err)
 			}
 
-			receivedAt := time.Now().UnixMilli()
 			switch req.Type {
 			case commonv1.HeartBeatType_HEART_BEAT_TYPE_PING:
 				sendCh <- &bookv1.HeartBeatResponse{
-					Type:       commonv1.HeartBeatType_HEART_BEAT_TYPE_PONG,
-					SentAt:     req.SentAt,
-					ReceivedAt: receivedAt,
+					Type:   commonv1.HeartBeatType_HEART_BEAT_TYPE_PONG,
+					SentAt: req.SentAt,
 				}
 			case commonv1.HeartBeatType_HEART_BEAT_TYPE_PONG:
+				receivedAt := time.Now().UnixMilli()
 				log.Println("received pong, latency:", receivedAt-req.SentAt)
 			default:
 				log.Println("received unknown heart beat type")
