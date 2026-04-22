@@ -1,6 +1,6 @@
 environment: dev
 database:
-  path: ./data/bookstore.db
+  file: ./data/bookstore.db
   max_open_conns: 1
   max_idle_conns: 1
   conn_max_lifetime: 5m

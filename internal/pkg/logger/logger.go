@@ -2,10 +2,12 @@ package logger
 
 import (
 	"bookstore/internal/pkg/config"
+	fileUtil "bookstore/util/file"
 	"fmt"
 	"io"
 	"log/slog"
 	"os"
+	"path/filepath"
 )
 
 var defaultLogger *slog.Logger
@@ -30,6 +32,9 @@ func InitLogger(cfg *config.Logging) error {
 	case "stdout":
 		writer = os.Stdout
 	case "file":
+		if err := fileUtil.MkDir(filepath.Dir(cfg.File)); err != nil {
+			return fmt.Errorf("failed to create directory: %w", err)
+		}
 		file, err := os.OpenFile(cfg.File, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 		if err != nil {
 			return fmt.Errorf("failed to open file: %w", err)

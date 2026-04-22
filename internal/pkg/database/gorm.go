@@ -2,6 +2,9 @@ package database
 
 import (
 	"bookstore/internal/pkg/config"
+	fileUtil "bookstore/util/file"
+	"fmt"
+	"path/filepath"
 
 	"github.com/samber/do/v2"
 	"gorm.io/driver/sqlite"
@@ -10,7 +13,10 @@ import (
 
 func NewDB(injector do.Injector) (*gorm.DB, error) {
 	cfg := do.MustInvoke[*config.Config](injector)
-	db, err := gorm.Open(sqlite.Open(cfg.Database.Path), &gorm.Config{})
+	if err := fileUtil.MkDir(filepath.Dir(cfg.Database.File)); err != nil {
+		return nil, fmt.Errorf("failed to create directory: %w", err)
+	}
+	db, err := gorm.Open(sqlite.Open(cfg.Database.File), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}

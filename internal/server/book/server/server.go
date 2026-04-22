@@ -16,7 +16,7 @@ import (
 )
 
 type BookServer struct {
-	cfg *config.Config
+	cfg         *config.Config
 	bookService *service.BookService
 }
 
@@ -24,7 +24,7 @@ func NewBookServer(i do.Injector) (*BookServer, error) {
 	cfg := do.MustInvoke[*config.Config](i)
 	bookService := do.MustInvoke[*service.BookService](i)
 	return &BookServer{
-		cfg: cfg,
+		cfg:         cfg,
 		bookService: bookService,
 	}, nil
 }
