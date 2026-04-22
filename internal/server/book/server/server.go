@@ -10,6 +10,7 @@ import (
 	"log"
 	"net"
 
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	"github.com/samber/do/v2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -40,12 +41,18 @@ func (s *BookServer) Run(ctx context.Context) error {
 		return fmt.Errorf("failed to initialize interceptor: %w", err)
 	}
 
+	loggingOptions := []logging.Option{
+		logging.WithLogOnEvents(logging.StartCall, logging.FinishCall),
+	}
+
 	grpcServer := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
 			interceptor.ValidateUnaryInterceptor(),
+			interceptor.LoggingUnaryInterceptor(loggingOptions...),
 		),
 		grpc.ChainStreamInterceptor(
 			interceptor.ValidateStreamInterceptor(),
+			interceptor.LoggingStreamInterceptor(loggingOptions...),
 		),
 	)
 	reflection.Register(grpcServer)
