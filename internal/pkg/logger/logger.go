@@ -12,7 +12,9 @@ import (
 
 var defaultLogger *slog.Logger
 
-func InitLogger(cfg *config.Logging) error {
+func InitLogger(cfg *config.Logging) (cleanup func(), err error) {
+	cleanup = func() {}
+
 	var level slog.Level
 	switch cfg.Level {
 	case "debug":
@@ -33,12 +35,16 @@ func InitLogger(cfg *config.Logging) error {
 		writer = os.Stdout
 	case "file":
 		if err := fileUtil.MkDir(filepath.Dir(cfg.File)); err != nil {
-			return fmt.Errorf("failed to create directory: %w", err)
+			return cleanup, fmt.Errorf("failed to create directory: %w", err)
 		}
 		file, err := os.OpenFile(cfg.File, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 		if err != nil {
-			return fmt.Errorf("failed to open file: %w", err)
+			return cleanup, fmt.Errorf("failed to open file: %w", err)
 		}
+		cleanup = func() {
+			file.Close()
+		}
+
 		writer = file
 	default:
 		writer = os.Stdout
@@ -61,7 +67,7 @@ func InitLogger(cfg *config.Logging) error {
 
 	defaultLogger = slog.New(handler)
 	slog.SetDefault(defaultLogger)
-	return nil
+	return cleanup, nil
 }
 
 func GetLogger() *slog.Logger {

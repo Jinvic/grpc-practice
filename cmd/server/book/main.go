@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bookstore/internal/pkg/config"
+	"bookstore/internal/pkg/logger"
 	"bookstore/internal/server/book/server"
 	"context"
 	"flag"
@@ -19,6 +21,14 @@ func main() {
 	if err := server.InitInjector(injector); err != nil {
 		log.Fatalf("failed to initialize injector: %v", err)
 	}
+
+	cfg := do.MustInvoke[*config.Config](injector)
+	cleanup, err := logger.InitLogger(&cfg.Logging)
+	if err != nil {
+		log.Fatalf("failed to initialize logger: %v", err)
+	}
+	defer cleanup()
+
 	bookServer, err := server.NewBookServer(injector)
 	if err != nil {
 		log.Fatalf("failed to create book server: %v", err)
