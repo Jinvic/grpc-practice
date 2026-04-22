@@ -4,6 +4,12 @@ database:
   max_open_conns: 1
   max_idle_conns: 1
   conn_max_lifetime: 5m
+logging:
+  level: debug
+  format: text
+  output: stdout
+  file: ./logs/bookstore.log
+  add_source: true
 services:
   book:
     host: localhost

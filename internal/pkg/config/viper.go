@@ -33,6 +33,11 @@ func setDefaultConfig(v *viper.Viper) {
 	v.SetDefault("database.max_idle_conns", 1)
 	v.SetDefault("database.conn_max_lifetime", "5m")
 
+	v.SetDefault("logging.level", "debug")
+	v.SetDefault("logging.format", "text")
+	v.SetDefault("logging.output", "stdout")
+	v.SetDefault("logging.file", "./logs/bookstore.log")
+
 	v.SetDefault("services.book.host", "localhost")
 	v.SetDefault("services.book.port", 8081)
 }
