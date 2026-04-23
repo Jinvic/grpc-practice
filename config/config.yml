@@ -6,11 +6,16 @@ database:
   conn_max_lifetime: 5m
 logging:
   level: debug
-  format: text
-  output: stdout
-  file: ./logs/bookstore.log
-  add_source: true
+  format: json
+  output: file
+  add_source: false
+  max_size: 100
+  max_age: 7
+  max_backups: 10
+  compress: false
+  local_time: false
 services:
   book:
     host: localhost
     port: 8081
+    log_file: ./logs/book_service.log

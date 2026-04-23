@@ -23,11 +23,7 @@ func main() {
 	}
 
 	cfg := do.MustInvoke[*config.Config](injector)
-	cleanup, err := logger.InitLogger(&cfg.Logging)
-	if err != nil {
-		log.Fatalf("failed to initialize logger: %v", err)
-	}
-	defer cleanup()
+	logger.InitLogger(&cfg.Logging, cfg.Services.Book.LogFile)
 
 	bookServer, err := server.NewBookServer(injector)
 	if err != nil {

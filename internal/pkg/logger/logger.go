@@ -2,19 +2,16 @@ package logger
 
 import (
 	"bookstore/internal/pkg/config"
-	fileUtil "bookstore/util/file"
-	"fmt"
 	"io"
 	"log/slog"
 	"os"
-	"path/filepath"
+
+	"github.com/natefinch/lumberjack"
 )
 
 var defaultLogger *slog.Logger
 
-func InitLogger(cfg *config.Logging) (cleanup func(), err error) {
-	cleanup = func() {}
-
+func InitLogger(cfg *config.Logging, logFile string) {
 	var level slog.Level
 	switch cfg.Level {
 	case "debug":
@@ -34,18 +31,14 @@ func InitLogger(cfg *config.Logging) (cleanup func(), err error) {
 	case "stdout":
 		writer = os.Stdout
 	case "file":
-		if err := fileUtil.MkDir(filepath.Dir(cfg.File)); err != nil {
-			return cleanup, fmt.Errorf("failed to create directory: %w", err)
+		writer = &lumberjack.Logger{
+			Filename:   logFile,
+			MaxSize:    cfg.MaxSize,
+			MaxAge:     cfg.MaxAge,
+			MaxBackups: cfg.MaxBackups,
+			Compress:   cfg.Compress,
+			LocalTime:  cfg.LocalTime,
 		}
-		file, err := os.OpenFile(cfg.File, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
-		if err != nil {
-			return cleanup, fmt.Errorf("failed to open file: %w", err)
-		}
-		cleanup = func() {
-			file.Close()
-		}
-
-		writer = file
 	default:
 		writer = os.Stdout
 	}
@@ -67,7 +60,6 @@ func InitLogger(cfg *config.Logging) (cleanup func(), err error) {
 
 	defaultLogger = slog.New(handler)
 	slog.SetDefault(defaultLogger)
-	return cleanup, nil
 }
 
 func GetLogger() *slog.Logger {

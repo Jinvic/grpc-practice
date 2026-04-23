@@ -14,8 +14,9 @@ type Services struct {
 }
 
 type BookService struct {
-	Host string `mapstructure:"host"`
-	Port int    `mapstructure:"port"`
+	Host    string `mapstructure:"host"`
+	Port    int    `mapstructure:"port"`
+	LogFile string `mapstructure:"log_file"`
 }
 
 type Database struct {
@@ -26,9 +27,13 @@ type Database struct {
 }
 
 type Logging struct {
-	Level     string `mapstructure:"level"`      // debug, info, warn, error
-	Format    string `mapstructure:"format"`     // json, text
-	Output    string `mapstructure:"output"`     // stdout, file
-	File      string `mapstructure:"file"`       // 日志文件路径
-	AddSource bool   `mapstructure:"add_source"` // 是否添加来源信息
+	Level      string `mapstructure:"level"`       // debug, info, warn, error
+	Format     string `mapstructure:"format"`      // json, text
+	Output     string `mapstructure:"output"`      // stdout, file
+	AddSource  bool   `mapstructure:"add_source"`  // 是否添加来源信息
+	MaxSize    int    `mapstructure:"max_size"`    // 日志文件最大大小
+	MaxAge     int    `mapstructure:"max_age"`     // 日志文件最大保存时间
+	MaxBackups int    `mapstructure:"max_backups"` // 日志文件最大备份数
+	Compress   bool   `mapstructure:"compress"`    // 是否压缩日志文件
+	LocalTime  bool   `mapstructure:"local_time"`  // 是否使用本地时间
 }
