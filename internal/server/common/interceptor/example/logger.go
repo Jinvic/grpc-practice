@@ -14,7 +14,7 @@ func LoggingUnaryInterceptor() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
 		start := time.Now()
 
-		l := logger.GetLogger().With(slog.String("method", info.FullMethod))
+		l := logger.FromContext(ctx).With(slog.String("method", info.FullMethod))
 		ctx = logger.WithContext(ctx, l)
 
 		resp, err := handler(ctx, req)
@@ -43,7 +43,7 @@ func LoggingStreamInterceptor() grpc.StreamServerInterceptor {
 	return func(srv any, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
 		start := time.Now()
 
-		l := logger.GetLogger().With(slog.String("method", info.FullMethod))
+		l := logger.FromContext(stream.Context()).With(slog.String("method", info.FullMethod))
 
 		wrappedStream := &loggedServerStream{
 			ServerStream: stream,
