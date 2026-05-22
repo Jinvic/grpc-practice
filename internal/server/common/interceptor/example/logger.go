@@ -69,19 +69,19 @@ func LoggingStreamInterceptor() grpc.StreamServerInterceptor {
 
 type loggedServerStream struct {
 	grpc.ServerStream
-	logger *slog.Logger
+	logger    *slog.Logger
 	recvCount int
-    sendCount int
+	sendCount int
 }
 
 func (s *loggedServerStream) RecvMsg(m any) error {
 	err := s.ServerStream.RecvMsg(m)
 	if err == nil {
 		s.recvCount++
-		s.logger.Debug("received message", 
-		"count", s.recvCount,
-		"message", m,
-	)
+		s.logger.Debug("received message",
+			"count", s.recvCount,
+			"message", m,
+		)
 	}
 	return err
 }
