@@ -16,6 +16,15 @@ logging:
   local_time: false
 services:
   book:
+    name: book_service
+    version: 1.0.0
     host: localhost
     port: 8081
     log_file: ./logs/book_service.log
+otel:
+  otel_endpoint: localhost:4317
+  trace_sample_rate: 0.1
+  batch_timeout: 5s
+  export_timeout: 10s
+  export_interval: 60s
+  insecure: true

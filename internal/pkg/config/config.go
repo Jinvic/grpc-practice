@@ -7,6 +7,7 @@ type Config struct {
 	Database    Database `mapstructure:"database"`
 	Logging     Logging  `mapstructure:"logging"`
 	Services    Services `mapstructure:"services"`
+	Otel        Otel     `mapstructure:"otel"`
 }
 
 type Services struct {
@@ -14,6 +15,8 @@ type Services struct {
 }
 
 type BookService struct {
+	Name    string `mapstructure:"name"`    // 服务名称（必填）
+	Version string `mapstructure:"version"` // 服务版本
 	Host    string `mapstructure:"host"`
 	Port    int    `mapstructure:"port"`
 	LogFile string `mapstructure:"log_file"`
@@ -36,4 +39,13 @@ type Logging struct {
 	MaxBackups int    `mapstructure:"max_backups"` // 日志文件最大备份数
 	Compress   bool   `mapstructure:"compress"`    // 是否压缩日志文件
 	LocalTime  bool   `mapstructure:"local_time"`  // 是否使用本地时间
+}
+
+type Otel struct {
+	OtelEndpoint    string        `mapstructure:"otel_endpoint"`     // OTLP 端点
+	TraceSampleRate float64       `mapstructure:"trace_sample_rate"` // 采样率 0-1，默认 0.1
+	BatchTimeout    time.Duration `mapstructure:"batch_timeout"`     // 批处理超时，默认 5s
+	ExportTimeout   time.Duration `mapstructure:"export_timeout"`    // 导出超时，默认 10s
+	ExportInterval  time.Duration `mapstructure:"export_interval"`   // 导出间隔，默认 60s
+	Insecure        bool          `mapstructure:"insecure"`          // 是否禁用 TLS（开发环境）
 }

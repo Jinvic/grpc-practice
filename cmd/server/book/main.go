@@ -3,6 +3,7 @@ package main
 import (
 	"bookstore/internal/pkg/config"
 	"bookstore/internal/pkg/logger"
+	"bookstore/internal/pkg/otel"
 	"bookstore/internal/server/book/server"
 	"context"
 	"flag"
@@ -17,6 +18,9 @@ import (
 func main() {
 	flag.Parse()
 
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	injector := do.New()
 	if err := server.InitInjector(injector); err != nil {
 		log.Fatalf("failed to initialize injector: %v", err)
@@ -24,14 +28,20 @@ func main() {
 
 	cfg := do.MustInvoke[*config.Config](injector)
 	logger.InitLogger(&cfg.Logging, cfg.Services.Book.LogFile)
+	shutdownOtel, err := otel.InitOtel(ctx, &cfg.Otel, cfg.Services.Book.Name, cfg.Services.Book.Version, cfg.Environment)
+	if err != nil {
+		log.Fatalf("failed to initialize otel: %v", err)
+	}
+	defer func() {
+		if err := shutdownOtel(context.Background()); err != nil {
+			log.Fatalf("failed to shutdown otel: %v", err)
+		}
+	}()
 
 	bookServer, err := server.NewBookServer(injector)
 	if err != nil {
 		log.Fatalf("failed to create book server: %v", err)
 	}
-
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
 
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)

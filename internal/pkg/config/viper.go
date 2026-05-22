@@ -43,7 +43,16 @@ func setDefaultConfig(v *viper.Viper) {
 	v.SetDefault("logging.compress", false)
 	v.SetDefault("logging.local_time", false)
 
+	v.SetDefault("services.book.name", "book_service")
+	v.SetDefault("services.book.version", "1.0.0")
 	v.SetDefault("services.book.host", "localhost")
 	v.SetDefault("services.book.port", 8081)
 	v.SetDefault("services.book.log_file", "./logs/book_service.log")
+
+	v.SetDefault("otel.otel_endpoint", "localhost:4317")
+	v.SetDefault("otel.trace_sample_rate", 0.1)
+	v.SetDefault("otel.batch_timeout", "5s")
+	v.SetDefault("otel.export_timeout", "10s")
+	v.SetDefault("otel.export_interval", "60s")
+	v.SetDefault("otel.insecure", false)
 }
