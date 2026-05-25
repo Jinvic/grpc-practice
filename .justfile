@@ -13,5 +13,9 @@ check:
   buf lint
   buf build
 
-gen: check
+fmt:
+  buf format -d
+
+gen: check fmt
+  buf dep update
   buf generate
