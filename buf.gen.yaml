@@ -19,6 +19,10 @@ plugins:
     out: api
     opt:
       - paths=source_relative
+  - remote: buf.build/grpc-ecosystem/gateway
+    out: api
+    opt:
+      - paths=source_relative
 
   # local plugin usage example
   # - local: protoc-gen-go
