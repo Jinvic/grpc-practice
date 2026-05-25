@@ -9,11 +9,15 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/http"
+	"time"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/samber/do/v2"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 )
 
@@ -32,6 +36,15 @@ func NewBookServer(i do.Injector) (*BookServer, error) {
 }
 
 func (s *BookServer) Run(ctx context.Context) error {
+	if s.cfg.Services.Book.EnableHTTP {
+		go func() {
+			time.Sleep(1 * time.Second) // wait for grpc server to start
+			if err := s.runHTTPGateway(ctx); err != nil {
+				log.Printf("failed to run http gateway: %v", err)
+			}
+		}()
+	}
+
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", s.cfg.Services.Book.Port))
 	if err != nil {
 		return fmt.Errorf("failed to listen: %w", err)
@@ -63,17 +76,55 @@ func (s *BookServer) Run(ctx context.Context) error {
 
 	go func() {
 		<-ctx.Done()
-		log.Println("shutting down server...")
+		log.Println("shutting down grpc server...")
 		grpcServer.GracefulStop()
 	}()
 
-	log.Printf("server listening at port %d", s.cfg.Services.Book.Port)
+	log.Printf("grpc server listening at port %d", s.cfg.Services.Book.Port)
 	if err := grpcServer.Serve(lis); err != nil {
 		if err == grpc.ErrServerStopped {
-			log.Println("server stopped")
+			log.Println("grpc server stopped")
 			return nil
 		}
 		return fmt.Errorf("failed to serve: %w", err)
+	}
+	return nil
+}
+
+func (s *BookServer) runHTTPGateway(ctx context.Context) error {
+	mux := runtime.NewServeMux()
+	opts := []grpc.DialOption{
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	}
+	grpcEndpoint := fmt.Sprintf("localhost:%d", s.cfg.Services.Book.Port)
+	err := bookv1.RegisterBookServiceHandlerFromEndpoint(ctx, mux, grpcEndpoint, opts)
+	if err != nil {
+		return err
+	}
+
+	httpAddr := fmt.Sprintf(":%d", s.cfg.Services.Book.HTTPPort)
+	httpServer := &http.Server{
+		Addr:    httpAddr,
+		Handler: mux,
+	}
+
+	go func() {
+		<-ctx.Done()
+		log.Println("shutting down http gateway...")
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := httpServer.Shutdown(shutdownCtx); err != nil {
+			log.Printf("failed to shutdown http gateway: %v", err)
+		}
+	}()
+
+	log.Printf("http gateway listening at port %d", s.cfg.Services.Book.HTTPPort)
+	if err := httpServer.ListenAndServe(); err != nil {
+		if err == http.ErrServerClosed {
+			log.Println("http gateway closed")
+			return nil
+		}
+		return fmt.Errorf("failed to serve http gateway: %w", err)
 	}
 	return nil
 }

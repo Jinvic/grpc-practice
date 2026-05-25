@@ -4,6 +4,7 @@ package book.v1;
 
 import "buf/validate/validate.proto";
 import "common/v1/types.proto";
+import "google/api/annotations.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
@@ -11,14 +12,30 @@ import "google/protobuf/timestamp.proto";
 option go_package = "bookstore/api/book/v1;bookv1";
 
 service BookService {
-  rpc GetBook(GetBookRequest) returns (GetBookResponse);
-  rpc CreateBook(CreateBookRequest) returns (CreateBookResponse);
-  rpc ListBooks(ListBooksRequest) returns (ListBooksResponse);
-  rpc UpdateBook(UpdateBookRequest) returns (UpdateBookResponse);
-  rpc DeleteBook(DeleteBookRequest) returns (DeleteBookResponse);
-  rpc BatchImportBooks(stream BatchImportBooksRequest) returns (BatchImportBooksResponse);
-  rpc BatchExportBooks(BatchExportBooksRequest) returns (stream BatchExportBooksResponse);
-  rpc HeartBeat(stream HeartBeatRequest) returns (stream HeartBeatResponse);
+  rpc GetBook(GetBookRequest) returns (GetBookResponse) {
+    option (google.api.http) = {get: "/v1/books/{id}"};
+  }
+  rpc CreateBook(CreateBookRequest) returns (CreateBookResponse) {
+    option (google.api.http) = {
+      post: "/v1/books"
+      body: "*"
+    };
+  }
+  rpc ListBooks(ListBooksRequest) returns (ListBooksResponse) {
+    option (google.api.http) = {get: "/v1/books"};
+  }
+  rpc UpdateBook(UpdateBookRequest) returns (UpdateBookResponse) {
+    option (google.api.http) = {
+      put: "/v1/books/{book.id}"
+      body: "*"
+    };
+  }
+  rpc DeleteBook(DeleteBookRequest) returns (DeleteBookResponse) {
+    option (google.api.http) = {delete: "/v1/books/{id}"};
+  }
+  rpc BatchImportBooks(stream BatchImportBooksRequest) returns (BatchImportBooksResponse) {}
+  rpc BatchExportBooks(BatchExportBooksRequest) returns (stream BatchExportBooksResponse) {}
+  rpc HeartBeat(stream HeartBeatRequest) returns (stream HeartBeatResponse) {}
 }
 
 message GetBookRequest {
