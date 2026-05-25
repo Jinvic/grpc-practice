@@ -48,6 +48,8 @@ func setDefaultConfig(v *viper.Viper) {
 	v.SetDefault("services.book.host", "localhost")
 	v.SetDefault("services.book.port", 8081)
 	v.SetDefault("services.book.log_file", "./logs/book_service.log")
+	v.SetDefault("services.book.http_port", 9091)
+	v.SetDefault("services.book.enable_http", true)
 
 	v.SetDefault("otel.otel_endpoint", "localhost:4317")
 	v.SetDefault("otel.trace_sample_rate", 0.1)

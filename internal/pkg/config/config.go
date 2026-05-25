@@ -15,11 +15,13 @@ type Services struct {
 }
 
 type BookService struct {
-	Name    string `mapstructure:"name"`    // 服务名称（必填）
-	Version string `mapstructure:"version"` // 服务版本
-	Host    string `mapstructure:"host"`
-	Port    int    `mapstructure:"port"`
-	LogFile string `mapstructure:"log_file"`
+	Name       string `mapstructure:"name"`    // 服务名称（必填）
+	Version    string `mapstructure:"version"` // 服务版本
+	Host       string `mapstructure:"host"`
+	Port       int    `mapstructure:"port"`
+	LogFile    string `mapstructure:"log_file"`
+	HTTPPort   int    `mapstructure:"http_port"`
+	EnableHTTP bool   `mapstructure:"enable_http"`
 }
 
 type Database struct {

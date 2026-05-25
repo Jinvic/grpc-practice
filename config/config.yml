@@ -21,6 +21,8 @@ services:
     host: localhost
     port: 8081
     log_file: ./logs/book_service.log
+    http_port: 9091
+    enable_http: true
 otel:
   otel_endpoint: localhost:4317
   trace_sample_rate: 0.1
